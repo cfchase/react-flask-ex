@@ -1,36 +1,62 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { incrementHelloWorld } from '../actions/helloWorld';
+import { getStatus } from '../actions/status';
 
 
 class HelloWorld extends React.Component {
+  componentDidMount() {
+    this.props.init();
+  }
+
   render() {
+    let post = <p></p>;
+    if (this.props.statusLoading) {
+      post = <p>Loading...</p>;
+    } else if (this.props.error) {
+      post = <p>Error: {JSON.stringify(this.props.error)}</p>
+    } else if (this.props.status) {
+      post = (
+        <div>
+          <p>Version: {this.props.status.version}</p>
+          <p>Status: {this.props.status.status}</p>
+          <p>Time: {this.props.status.time}</p>
+        </div>
+      )
+    }
+
     return (
       <div>
-      <h2>Hello World - {this.props.increment}!</h2>
         <button
-          id="helloWorldClick"
+          id="updateStatusButton"
           type="button"
           onClick={e => {
             this.props.click(e);
           }}
         >
-          Click Me
+          Update Status
         </button>
+        {post}
+
       </div>
     )
   }
 }
 
-const mapStateToProps = (state) => ({
-  increment: state.helloWorldReducer.increment
-});
+function mapStateToProps(state) {
+  return state.helloWorldReducer;
+}
 
-const mapDispatchToProps = (dispatch) => ({
-  click: (e) => {
-    e.preventDefault();
-    dispatch(incrementHelloWorld());
-  }
-});
+function mapDispatchToProps(dispatch) {
+  return {
+    init: () => {
+      dispatch(getStatus());
+    },
+    click: (e) => {
+      e.preventDefault();
+      dispatch(getStatus());
+    }
+  };
+}
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(HelloWorld);
