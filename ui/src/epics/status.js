@@ -1,15 +1,22 @@
-import { Observable } from 'rxjs';
+import { Observable } from "rxjs";
+import { ajax } from "rxjs/ajax";
+import { switchMap, map, catchError } from "rxjs/operators";
+import { ofType } from 'redux-observable';
+
 import {
   TYPE_GET_STATUS,
   getStatusSucceeded,
   getStatusFailed
-} from '../actions/status';
+} from "../actions/status";
 
-export function statusEpic(action$) {
-  return action$.ofType(TYPE_GET_STATUS).switchMap(action$ =>
-    Observable.ajax
-      .getJSON('/api/v1/status')
-      .map(post => getStatusSucceeded(post))
-      .catch(error => Observable.of(getStatusFailed(error)))
+export function statusEpics(action$) {
+  return action$.pipe(
+    ofType(TYPE_GET_STATUS),
+    switchMap(action =>
+      ajax.getJSON("/api/v1/status").pipe(
+        map(post => getStatusSucceeded(post)),
+        catchError(error => Observable.of(getStatusFailed(error)))
+      )
+    )
   );
 }

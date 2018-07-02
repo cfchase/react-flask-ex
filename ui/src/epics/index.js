@@ -1,6 +1,6 @@
 import { combineEpics } from 'redux-observable';
-import { statusEpic } from './status';
+import { statusEpics } from './status';
 
 export const rootEpic = combineEpics(
-  statusEpic
+  statusEpics
 );
